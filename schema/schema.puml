@@ -1,0 +1,41 @@
+@startuml home
+
+hide circle
+skinparam linetype ortho
+
+entity food_categories {
+  * id : number <<generated>>
+  * name : text <<unique>>
+  --
+  * description : text
+}
+
+entity food_subcategories {
+  * id : number <<generated>>
+  * name : text <<unique>>
+  --
+  * description : text
+  * category_id : number
+}
+
+entity food_units {
+  * id : number <<generated>>
+  * name : text <<unique>>
+  --
+  * description : text
+  * subcategory_id : number
+}
+
+entity food_unit_varieties {
+  * id : number <<generated>>
+  * name : text <<unique>>
+  --
+  * description : text
+  * img : text
+  * unit_id : number
+}
+
+food_subcategories }|--|| food_categories
+food_units }|--|| food_subcategories
+food_unit_varieties }|--|| food_units
+@enduml
