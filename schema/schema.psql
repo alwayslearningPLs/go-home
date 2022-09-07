@@ -1,0 +1,215 @@
+DROP DATABASE IF EXISTS home;
+CREATE DATABASE home;
+\c home;
+
+-- Reference: https://www.flickr.com/photos/usdagov/36623517294/sizes/l
+CREATE TABLE food_categories(
+  id SMALLINT GENERATED ALWAYS AS IDENTITY,
+  name TEXT NOT NULL UNIQUE,
+  description TEXT NOT NULL,
+  PRIMARY KEY (id)
+);
+
+CREATE FUNCTION FOOD_CATEGORY_BY_NAME(food_category_name TEXT)
+  RETURNS INT
+  LANGUAGE PLPGSQL
+AS
+$$
+DECLARE
+  food_category_id INT;
+BEGIN
+  SELECT id
+  INTO food_category_id
+  FROM food_categories
+  WHERE name LIKE food_category_name;
+
+  RETURN food_category_id;
+END
+$$;
+
+INSERT INTO food_categories(name, description)
+VALUES
+  ('fruit', 'the sweet and fleshy product of a tree or other plant that contains seed and can be eaten as food'),
+  ('vegetables', 'a plant or part of a plant used as food, such as a cabbage, potato, turnip, or bean'),
+  ('grains', 'a single fruit or seed of a cereal'),
+  ('protein foods', 'A variety of protein foods, including egg, salmon, beef, chicken, beans'),
+  ('dairy', 'containing or made from milk');
+
+CREATE TABLE food_subcategories(
+  id SMALLINT GENERATED ALWAYS AS IDENTITY,
+  name TEXT NOT NULL UNIQUE,
+  description TEXT NOT NULL,
+  category_id SMALLINT NOT NULL REFERENCES food_categories(id) ON UPDATE CASCADE,
+  PRIMARY KEY(id)
+);
+
+CREATE FUNCTION FOOD_SUBCATEGORY_BY_NAME(food_subcategory_name TEXT)
+  RETURNS INT
+  LANGUAGE PLPGSQL
+AS
+$$
+DECLARE
+  food_subcategory_id INT;
+BEGIN
+  SELECT id
+  INTO food_subcategory_id
+  FROM food_subcategories
+  WHERE name LIKE food_subcategory_name;
+
+  RETURN food_subcategory_id;
+END
+$$;
+
+INSERT INTO food_subcategories(name, description, category_id)
+VALUES
+  ('Whole fruit', 'the whole fruit as a piece. eg. apple, banana, orange, peach, pear, grapes, watermelon, cantaloupe, pomegranate, strawberry, pineapple, mango, raisins, grapefruit, cherries, raisins, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('fruit') )),
+  ('Fruit juice', 'the whole fruit as a piece', ( SELECT FOOD_CATEGORY_BY_NAME('fruit') )),
+  ('Dark Green vegetable', 'dark green vegetables as broccoli, collard greens, spinach, romaine, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('vegetables') )),
+  ('Red and Orange Vegetables', 'red and orange vegetables as carrots, red peppers, tomatoes, sweet potatos, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('vegetables') )),
+  ('Beans and Peas', 'Beans and Peas as kidney beans, black beans, chickpeas, split peas, lentils, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('vegetables') )),
+  ('Starchy Vegetables', 'White potatoes, corn, green peas, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('vegetables') )),
+  ('Other vegetables', 'Here we write other vegetables as mushrooms, summer squash, iceberg lettuce, avocado, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('vegetables') )),
+  ('Whole Grains', 'whole grains as whole wheat bread, brown rice, popcorn, oatmeal, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('grains') )),
+  ('Refined Grains', 'Pretzels, English muffins, corn tortilla, grits, regular pasta, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('grains') )),
+  ('Seafood', 'Salmon, tuna, trout, tilapia, sardines, herring, mackerel, shrimp, crab, oysters, mussels, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('protein foods') )),
+  ('Meat, Poultry and Eggs', 'Beef, chicken, turkey, pork, eggs, etc', ( SELECT FOOD_CATEGORY_BY_NAME('protein foods') )),
+  ('Nuts, Seeds and Soy', 'Nuts, nut butters, seeds, soy products, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('protein foods') )),
+  ('Milk and yogurt', 'Milk, yogurt', ( SELECT FOOD_CATEGORY_BY_NAME('dairy') )),
+  ('Cheese', 'Kefir, cheese, cottage cheese, calcium-fortified soymilk, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('dairy') ));
+
+CREATE TABLE food_units(
+  id INT GENERATED ALWAYS AS IDENTITY,
+  name TEXT NOT NULL UNIQUE,
+  description TEXT NOT NULL,
+  subcategory_id SMALLINT NOT NULL REFERENCES food_subcategories(id) ON UPDATE CASCADE,
+  PRIMARY KEY(id)
+);
+
+CREATE FUNCTION FOOD_UNIT_BY_NAME(food_unit_name TEXT)
+  RETURNS INT
+  LANGUAGE PLPGSQL
+AS
+$$
+DECLARE
+  food_unit_id INT;
+BEGIN
+  SELECT id
+  INTO food_unit_id
+  FROM food_units
+  WHERE name LIKE food_unit_name;
+
+  RETURN food_unit_id;
+END
+$$;
+
+INSERT INTO food_units(name, description, subcategory_id)
+VALUES
+  (
+    'apple', 'the round fruit of a tree of the rose family, which typically has thin green or red skin and crisp flesh',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  ),
+  (
+    'banana', 'a long curved fruit which grows in clusters and has soft pulpy flesh and yellow skin when ripe',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  ),
+  (
+    'orange', 'a large round juicy citrus fruit with a tough bright reddish-yellow rind',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  ),
+  (
+    'peach', 'a round stone fruit with juicy yellow flesh and downy pinkish-yellow skin',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  ),
+  (
+    'pear', 'a yellowish- or brownish-green edible fruit that is typically narrow at the stalk and wider towards the base, with sweet, slightly gritty flesh',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  ),
+  (
+    'grapes', 'a berry (typically green, purple, or black) growing in clusters on a grapevine, eaten as fruit and used in making wine',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  ),
+  (
+    'watermelon', 'the large fruit of a plant of the gourd family, with smooth green skin, red pulp, and watery juice',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  ),
+  (
+    'cantaloupe', 'a small round melon of a variety with orange flesh and ribbed skin',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  ),
+  (
+    'pomegranate', 'a spherical fruit with a tough golden-orange outer skin and sweet red gelatinous flesh containing many seeds',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  ),
+  (
+    'strawberry', 'a sweet soft red fruit with a seed-studded surface',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  ),
+  (
+    'pineapple', 'the widely cultivated tropical American plant that bears the pineapple. It is low-growing, with a spiral of spiny sword-shaped leaves on a thick ste',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  ),
+  (
+    'mango', 'a fleshy, oval, yellowish-red tropical fruit that is eaten ripe or used green for pickles or chutneys',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  ),
+  (
+    'raisins', 'a partially dried grape',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  ),
+  (
+    'grapefruit', 'a large round yellow citrus fruit with an acid juicy pulp',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  ),
+  (
+    'cherries', 'a small, soft round stone fruit that is typically bright or dark red',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  );
+
+CREATE TABLE food_unit_varieties(
+  id INT GENERATED ALWAYS AS IDENTITY,
+  name TEXT NOT NULL UNIQUE,
+  description TEXT NOT NULL,
+  img TEXT NOT NULL,
+  unit_id INT NOT NULL REFERENCES food_units(id) ON UPDATE CASCADE,
+  PRIMARY KEY(id)
+);
+
+-- apples: https://www.jessicagavin.com/types-of-apples/ | https://usapple.org/apple-varieties | https://www.homefortheharvest.com/types-of-apples/
+INSERT INTO food_unit_varieties(name, description, img, unit_id)
+VALUES
+  (
+    'Cripps Pink or Pink Lady', 'Developed in Western Australia, Cripps Pink is a cross of Golden Delicious and Lady Williams. Brisk, autumn nights help bring out its bright, namesake coloring. Available November to August, Cripps Pink are often found under the retail name Pink Lady',
+    'https://usapple.org/wp-content/uploads/2019/10/apple-pink-lady.png', ( SELECT FOOD_UNIT_BY_NAME('apple') )
+  ),
+  (
+    'Empire', 'Empires premiered in 1966 in the Empire State of New York. They are a cross between Red Delicious and McIntosh developed by the New York State Agricultural Experiment Station. This crisp, juicy apple has a delightful sweet-tart flavor and creamy white flesh, making it a good all-purpose apple. Stake out your Empire between September and July',
+    'https://usapple.org/wp-content/uploads/2019/10/apple-empire.png', ( SELECT FOOD_UNIT_BY_NAME('apple') )
+  ),
+  (
+    'Fuji', 'Originally developed in Japan in the late 1930s and named after the famous Mt. Fuji, U.S.-grown Fujis began appearing in markets in the 1980s. Fuji is a cross between Ralls Janet and Red Delicious. This variety´s popularity is skyrocketing, thanks to its sweet flavor and firmness. Fuji apples are bi-colored, typically striped with yellow and red. They are available year round, beginning in September',
+    'https://usapple.org/wp-content/uploads/2019/10/apple-fuji.png', ( SELECT FOOD_UNIT_BY_NAME('apple') )
+  ),
+  (
+    'Gala', 'This variety, a cross between Kidd’s Orange Red and Golden Delicious, originated in New Zealand. The Royal Gala strain was named in honor of Queen Elizabeth II, who deemed it her favorite during a visit to New Zealand. It was brought to the United States in the early 1970s and is now one of the country’s most popular apples. Crisp, juicy, and very sweet, Gala is ideal for snacking. Galas can vary in color, from cream to red- and yellow-striped. U.S.-grown Galas are harvested beginning in mid-July and are typically available year round',
+    'https://usapple.org/wp-content/uploads/2019/10/apple-gala.png', ( SELECT FOOD_UNIT_BY_NAME('apple') )
+  ),
+  (
+    'Golden Delicious', 'Yellow with an occasional pink blush, Golden Delicious is “Apple Lite” – loved by those who prefer a mild, sweet flavor. There’s nothing tart about this apple….just a buttery, honey taste to please. Great for baking into apple pies and crisps mixed with more tart apples like Granny Smiths. It makes for a great flavor combo that tickles all your taste buds, all year round',
+    'https://usapple.org/wp-content/uploads/2019/10/apple-golden-delicious.png', ( SELECT FOOD_UNIT_BY_NAME('apple') )
+  ),
+  (
+    'Granny Smith', 'This Australian native was discovered in 1868 as a chance seedling by “Granny” Anne Smith of Ryde, New South Wales. One parent might have been a French crabapple. Grannies are known for their distinctive green flesh – which sometimes bears a red blush – and their very tart flavor. An all-purpose apple, Grannies work equally well as a snack or in pies and sauce. U.S. Grannies are harvested beginning in August and are available year round',
+    'https://usapple.org/wp-content/uploads/2019/10/apple-granny-smith.png', ( SELECT FOOD_UNIT_BY_NAME('apple') )
+  ),
+  (
+    'Honeycrisp', 'This honey of an apple has a honeyed, mild flavor and a crispness deemed explosive. Juicy and sweet, this popular newcomer is a cross between Keepsake and an unreleased Minnesota line known as MN 1627. Honeycrisp’s skin is a distinctive mottled red over a yellow background, with coarse flesh. This apple is good for snacking, salads and sauce-making and stores well. Honeycrisp is “college educated,” developed by the University of Minnesota. Supplies are limited but growing with harvest beginning in September',
+    'https://usapple.org/wp-content/uploads/2019/10/apple-honeycrisp.png', ( SELECT FOOD_UNIT_BY_NAME('apple') )
+  ),
+  (
+    'McIntosh', 'This old, well-known variety was discovered as a chance seedling by John McIntosh in 1811. Its deep-red finish sometimes carries a green blush. Juicy, tangy, tart McIntosh has a tender, white flesh. It is best used for snacking and applesauce, but some people enjoy its tart flavor in pies as well. This apple is typically available from September through May. Cook’s hints: McIntosh cooks down easily; if pie making, cut slices thick or add a thickener',
+    'https://usapple.org/wp-content/uploads/2019/10/apple-mcIntosh.png', ( SELECT FOOD_UNIT_BY_NAME('apple') )
+  ),
+  (
+    'Red Delicious', 'The most widely recognized of all U.S. apple varieties originated in Iowa in the 1870s. This sweet, crispy, juicy apple varies in color from striped red to solid midnight red. Western Red Delicious are elongated in shape, with pronounced “feet.” Eastern-grown Delicious are more round. This apple is best eaten fresh or in salads',
+    'https://usapple.org/wp-content/uploads/2019/10/apple-red-delicious.png', ( SELECT FOOD_UNIT_BY_NAME('apple') )
+  );
