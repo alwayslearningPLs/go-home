@@ -39,7 +39,7 @@ CREATE TABLE food_subcategories(
   id SMALLINT GENERATED ALWAYS AS IDENTITY,
   name TEXT NOT NULL UNIQUE,
   description TEXT NOT NULL,
-  category_id SMALLINT NOT NULL REFERENCES food_categories(id) ON UPDATE CASCADE,
+  food_category_id SMALLINT NOT NULL REFERENCES food_categories(id) ON UPDATE CASCADE,
   PRIMARY KEY(id)
 );
 
@@ -60,7 +60,7 @@ BEGIN
 END
 $$;
 
-INSERT INTO food_subcategories(name, description, category_id)
+INSERT INTO food_subcategories(name, description, food_category_id)
 VALUES
   ('Whole fruit', 'the whole fruit as a piece. eg. apple, banana, orange, peach, pear, grapes, watermelon, cantaloupe, pomegranate, strawberry, pineapple, mango, raisins, grapefruit, cherries, raisins, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('fruit') )),
   ('Fruit juice', 'the whole fruit as a piece', ( SELECT FOOD_CATEGORY_BY_NAME('fruit') )),
@@ -69,7 +69,7 @@ VALUES
   ('Beans and Peas', 'Beans and Peas as kidney beans, black beans, chickpeas, split peas, lentils, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('vegetables') )),
   ('Starchy Vegetables', 'White potatoes, corn, green peas, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('vegetables') )),
   ('Other vegetables', 'Here we write other vegetables as mushrooms, summer squash, iceberg lettuce, avocado, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('vegetables') )),
-  ('Whole Grains', 'whole grains as whole wheat bread, brown rice, popcorn, oatmeal, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('grains') )),
+  ('Whole Grains', 'whole grains whole wheat bread, brown rice, popcorn, oatmeal, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('grains') )),
   ('Refined Grains', 'Pretzels, English muffins, corn tortilla, grits, regular pasta, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('grains') )),
   ('Seafood', 'Salmon, tuna, trout, tilapia, sardines, herring, mackerel, shrimp, crab, oysters, mussels, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('protein foods') )),
   ('Meat, Poultry and Eggs', 'Beef, chicken, turkey, pork, eggs, etc', ( SELECT FOOD_CATEGORY_BY_NAME('protein foods') )),
@@ -81,7 +81,7 @@ CREATE TABLE food_units(
   id INT GENERATED ALWAYS AS IDENTITY,
   name TEXT NOT NULL UNIQUE,
   description TEXT NOT NULL,
-  subcategory_id SMALLINT NOT NULL REFERENCES food_subcategories(id) ON UPDATE CASCADE,
+  food_subcategory_id SMALLINT NOT NULL REFERENCES food_subcategories(id) ON UPDATE CASCADE,
   PRIMARY KEY(id)
 );
 
@@ -102,7 +102,7 @@ BEGIN
 END
 $$;
 
-INSERT INTO food_units(name, description, subcategory_id)
+INSERT INTO food_units(name, description, food_subcategory_id)
 VALUES
   (
     'apple', 'the round fruit of a tree of the rose family, which typically has thin green or red skin and crisp flesh',
@@ -170,12 +170,12 @@ CREATE TABLE food_unit_varieties(
   name TEXT NOT NULL UNIQUE,
   description TEXT NOT NULL,
   img TEXT NOT NULL,
-  unit_id INT NOT NULL REFERENCES food_units(id) ON UPDATE CASCADE,
+  food_unit_id INT NOT NULL REFERENCES food_units(id) ON UPDATE CASCADE,
   PRIMARY KEY(id)
 );
 
 -- apples: https://www.jessicagavin.com/types-of-apples/ | https://usapple.org/apple-varieties | https://www.homefortheharvest.com/types-of-apples/
-INSERT INTO food_unit_varieties(name, description, img, unit_id)
+INSERT INTO food_unit_varieties(name, description, img, food_unit_id)
 VALUES
   (
     'Cripps Pink or Pink Lady', 'Developed in Western Australia, Cripps Pink is a cross of Golden Delicious and Lady Williams. Brisk, autumn nights help bring out its bright, namesake coloring. Available November to August, Cripps Pink are often found under the retail name Pink Lady',

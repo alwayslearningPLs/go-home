@@ -1,0 +1,10 @@
+db: host=localhost user=postgres password=abc123. dbname=home port=5432 sslmode=disable TimeZone=Europe/Madrid
+logger:
+  prod: false
+  file_appenders:
+  - file: ./go-home.log
+    level: debug
+    date_format: RFC3339
+  console_appender:
+    level: debug
+    date_format: RFC3339
