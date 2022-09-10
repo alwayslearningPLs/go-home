@@ -24,7 +24,7 @@ func addSubcategory(ctx context.Context, fc *FoodSubcategory) error {
 }
 
 func delSubcategory(ctx context.Context, fc FoodSubcategory) (rows int64, err error) {
-	tx := JoinSubcategories(WhereSubcategories(config.GetInstance(ctx), fc), fc).Delete(fc)
+	tx := WhereSubcategories(SubquerySubcategories(config.GetInstance(ctx), fc), fc).Delete(fc)
 	return tx.RowsAffected, tx.Error
 }
 
@@ -49,13 +49,16 @@ func WhereSubcategories(db *gorm.DB, fc FoodSubcategory) *gorm.DB {
 		db = db.Where(fc.TableName()+".description like ?", fc.Description)
 	}
 
-	// db = db.Where(fc.TableName()+".id IN (?)", ca.SelectWhereCategories(db, fc.FoodCategory, "id"))
 	return db
 }
 
 func JoinSubcategories(db *gorm.DB, fs FoodSubcategory) *gorm.DB {
-	db = db.Joins("JOIN " + fs.FoodCategory.TableName() + " ON " + fs.FoodCategory.TableName() + ".id = " + fs.TableName() + ".id")
+	db = db.Joins("JOIN " + fs.FoodCategory.TableName() + " ON " + fs.FoodCategory.TableName() + ".id = " + fs.TableName() + ".food_category_id")
 	return ca.WhereCategories(db, fs.FoodCategory)
+}
+
+func SubquerySubcategories(db *gorm.DB, fs FoodSubcategory) *gorm.DB {
+	return db.Where(fs.TableName()+".food_category_id IN (?)", ca.SelectWhereCategories(db, fs.FoodCategory, "id"))
 }
 
 func SelectWhereSubcategories(db *gorm.DB, fs FoodSubcategory, projection ...string) *gorm.DB {
