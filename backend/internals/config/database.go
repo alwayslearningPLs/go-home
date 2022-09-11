@@ -28,3 +28,7 @@ func ConfigureDB(connStr string) {
 func GetInstance(ctx context.Context) *gorm.DB {
 	return db.WithContext(ctx)
 }
+
+func GetDrySession(ctx context.Context) *gorm.DB {
+	return db.Session(&gorm.Session{DryRun: true}).WithContext(ctx)
+}

@@ -12,7 +12,7 @@ import (
 
 func addSubcategory(ctx context.Context, fc *FoodSubcategory) error {
 	return config.GetInstance(ctx).Transaction(func(tx *gorm.DB) error {
-		txx := ca.WhereCategories(tx, fc.FoodCategory).Find(&fc.FoodCategory)
+		txx := tx.Where(&fc.FoodCategory).Find(&fc.FoodCategory)
 		if txx.Error != nil {
 			return txx.Error
 		} else if fc.FoodCategory.ID == 0 {
@@ -24,14 +24,17 @@ func addSubcategory(ctx context.Context, fc *FoodSubcategory) error {
 }
 
 func delSubcategory(ctx context.Context, fc FoodSubcategory) (rows int64, err error) {
-	tx := WhereSubcategories(SubquerySubcategories(config.GetInstance(ctx), fc), fc).Delete(fc)
+	tx := WhereSubcategories(SubqueryCategories(config.GetInstance(ctx), fc), fc).Delete(fc)
 	return tx.RowsAffected, tx.Error
 }
 
 func getSubcategories(ctx context.Context, wrap utils.WrapperRequest[FoodSubcategory]) ([]FoodSubcategory, error) {
 	var result []FoodSubcategory
 
-	tx := JoinSubcategories(WhereSubcategories(wrap.ToScope(config.GetInstance(ctx)), wrap.Body), wrap.Body).Preload("FoodCategory").Find(&result)
+	tx := ca.WhereCategories(
+		WhereSubcategories(wrap.ToScope(config.GetInstance(ctx)), wrap.Body).
+			Joins("INNER JOIN food_categories USING(food_category_id)"), wrap.Body.FoodCategory).
+		Find(&result)
 
 	return result, tx.Error
 }
@@ -52,12 +55,11 @@ func WhereSubcategories(db *gorm.DB, fc FoodSubcategory) *gorm.DB {
 	return db
 }
 
-func JoinSubcategories(db *gorm.DB, fs FoodSubcategory) *gorm.DB {
-	db = db.Joins("JOIN " + fs.FoodCategory.TableName() + " ON " + fs.FoodCategory.TableName() + ".id = " + fs.TableName() + ".food_category_id")
-	return ca.WhereCategories(db, fs.FoodCategory)
+func JoinCategories(db *gorm.DB, fs FoodSubcategory) *gorm.DB {
+	return ca.WhereCategories(db.Joins("JOIN "+fs.FoodCategory.TableName()+" USING(food_category_id)"), fs.FoodCategory)
 }
 
-func SubquerySubcategories(db *gorm.DB, fs FoodSubcategory) *gorm.DB {
+func SubqueryCategories(db *gorm.DB, fs FoodSubcategory) *gorm.DB {
 	return db.Where(fs.TableName()+".food_category_id IN (?)", ca.SelectWhereCategories(db, fs.FoodCategory, "id"))
 }
 

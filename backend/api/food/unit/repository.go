@@ -23,15 +23,21 @@ func addUnit(ctx context.Context, fu *FoodUnit) error {
 	})
 }
 
-func delSubCategory(ctx context.Context, fu FoodUnit) (rows int64, err error) {
-	tx := JoinUnit(sca.WhereSubcategories(config.GetInstance(ctx), fu.FoodSubcategory), fu).Delete(&fu)
+func delUnit(ctx context.Context, fu FoodUnit) (rows int64, err error) {
+	tx := WhereUnit(SubQueryUnit(config.GetInstance(ctx), fu), fu).Delete(&fu)
 	return tx.RowsAffected, tx.Error
 }
 
 func getUnits(ctx context.Context, wrap utils.WrapperRequest[FoodUnit]) ([]FoodUnit, error) {
 	var result []FoodUnit
 
-	tx := WhereUnit(wrap.ToScope(config.GetInstance(ctx)), wrap.Body).Preload("FoodSubcategory").Find(&result)
+	tx := WhereUnit(wrap.ToScope(config.GetInstance(ctx)), wrap.Body)
+
+	if wrap.Body.FoodSubcategory.FoodCategory.Name != "" {
+		tx = JoinCategories(tx, wrap.Body).Find(&result)
+	} else {
+		tx = JoinSubcategories(tx, wrap.Body).Find(&result)
+	}
 
 	return result, tx.Error
 }
@@ -52,12 +58,15 @@ func WhereUnit(db *gorm.DB, fu FoodUnit) *gorm.DB {
 	return db
 }
 
-func JoinUnit(db *gorm.DB, fu FoodUnit) *gorm.DB {
-	db = db.Joins("JOIN " + fu.FoodSubcategory.TableName() + " ON " + fu.FoodSubcategory.TableName() + ".id = " + fu.TableName() + ".id")
-	return WhereUnit(db, fu)
+func JoinSubcategories(db *gorm.DB, fu FoodUnit) *gorm.DB {
+	db = db.Joins("JOIN " + fu.FoodSubcategory.TableName() + " USING(food_subcategory_id)")
+	return sca.WhereSubcategories(db, fu.FoodSubcategory)
 }
 
-func doGetUnit(ctx context.Context, wrap utils.WrapperRequest[FoodUnit]) *gorm.DB {
-	return wrap.ToScope(config.GetInstance(ctx)).
-		Where("food_subcategories.name = ?", wrap.Body.FoodSubcategory.Name)
+func JoinCategories(db *gorm.DB, fu FoodUnit) *gorm.DB {
+	return sca.JoinCategories(JoinSubcategories(db, fu), fu.FoodSubcategory)
+}
+
+func SubQueryUnit(db *gorm.DB, fu FoodUnit) *gorm.DB {
+	return db.Where(fu.TableName()+".food_subcategory_id IN (?)", sca.SelectWhereSubcategories(db, fu.FoodSubcategory, "id"))
 }

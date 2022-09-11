@@ -9,3 +9,7 @@ run:
 debug:
 	CGO_ENABLED=0 GOARCH=amd64 GOOS=linux go build -o ./bin -gcflags="all=-N -l" ./...
 	@dlv --listen=:2345 --headless=true --api-version=2 exec ./bin/backend
+
+# Not in use yet
+local:
+	@docker-compose up --detach
