@@ -11,7 +11,7 @@ type FoodCategory struct {
 	// swagger:ignore
 	XMLName xml.Name `gorm:"-" json:"-" xml:"FoodCategory"`
 	// swagger:ignore
-	ID int `gorm:"column:id;primaryKey" json:"-" xml:"-"`
+	ID int `gorm:"column:food_category_id;primaryKey" json:"-" xml:"-"`
 	// The name of the category
 	//
 	// required: true

@@ -14,14 +14,14 @@ func addCategory(ctx context.Context, fc *FoodCategory) (rows int64, err error) 
 }
 
 func delCategory(ctx context.Context, fc FoodCategory) (rows int64, err error) {
-	tx := WhereCategories(config.GetInstance(ctx), fc).Delete(fc)
+	tx := config.GetInstance(ctx).Where(&fc).Delete(fc)
 	return tx.RowsAffected, tx.Error
 }
 
 func getCategories(ctx context.Context, wrap utils.WrapperRequest[FoodCategory]) ([]FoodCategory, error) {
 	var result []FoodCategory
 
-	tx := WhereCategories(wrap.ToScope(config.GetInstance(ctx)), wrap.Body).Find(&result)
+	tx := wrap.ToScope(config.GetInstance(ctx).Where(wrap.Body)).Find(&result)
 
 	return result, tx.Error
 }
@@ -43,5 +43,5 @@ func WhereCategories(db *gorm.DB, fc FoodCategory) *gorm.DB {
 }
 
 func SelectWhereCategories(db *gorm.DB, fc FoodCategory, projection ...string) *gorm.DB {
-	return WhereCategories(db.Table(fc.TableName()).Select(projection), fc)
+	return db.Table(fc.TableName()).Select(projection).Where(&fc)
 }

@@ -9,10 +9,12 @@ import (
 )
 
 const (
-	// CategoriesPath retrieves all the categories inside the db
-	CategoriesPath = "/food/categories"
+	// CategoriesPath retrieves all the categories inside the db.
+	// /food/categories
+	CategoriesPath = "/categories"
 	// CategoryByNamePath is used by the handler GetCategoryByName to
 	// return the category by name.
+	// /food/categories/:category-name
 	CategoryByNamePath = CategoriesPath + "/:" + CategoryNameParam
 
 	// CategoryNameParam is the category name value

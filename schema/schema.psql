@@ -4,7 +4,7 @@ CREATE DATABASE home;
 
 -- Reference: https://www.flickr.com/photos/usdagov/36623517294/sizes/l
 CREATE TABLE food_categories(
-  id SMALLINT GENERATED ALWAYS AS IDENTITY,
+  food_category_id SMALLINT GENERATED ALWAYS AS IDENTITY,
   name TEXT NOT NULL UNIQUE,
   description TEXT NOT NULL,
   PRIMARY KEY (id)
@@ -36,7 +36,7 @@ VALUES
   ('dairy', 'containing or made from milk');
 
 CREATE TABLE food_subcategories(
-  id SMALLINT GENERATED ALWAYS AS IDENTITY,
+  food_subcategory_id SMALLINT GENERATED ALWAYS AS IDENTITY,
   name TEXT NOT NULL UNIQUE,
   description TEXT NOT NULL,
   food_category_id SMALLINT NOT NULL REFERENCES food_categories(id) ON UPDATE CASCADE,
@@ -78,7 +78,7 @@ VALUES
   ('Cheese', 'Kefir, cheese, cottage cheese, calcium-fortified soymilk, etc.', ( SELECT FOOD_CATEGORY_BY_NAME('dairy') ));
 
 CREATE TABLE food_units(
-  id INT GENERATED ALWAYS AS IDENTITY,
+  food_unit_id INT GENERATED ALWAYS AS IDENTITY,
   name TEXT NOT NULL UNIQUE,
   description TEXT NOT NULL,
   food_subcategory_id SMALLINT NOT NULL REFERENCES food_subcategories(id) ON UPDATE CASCADE,
@@ -163,10 +163,14 @@ VALUES
   (
     'cherries', 'a small, soft round stone fruit that is typically bright or dark red',
     ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+  ),
+  (
+    'beef', 'the flesh of a cow, bull, or ox, used as food',
+    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Meat, Poultry and Eggs') )
   );
 
 CREATE TABLE food_unit_varieties(
-  id INT GENERATED ALWAYS AS IDENTITY,
+  food_unit_variety_id INT GENERATED ALWAYS AS IDENTITY,
   name TEXT NOT NULL UNIQUE,
   description TEXT NOT NULL,
   img TEXT NOT NULL,

@@ -3,13 +3,11 @@ SELECT sca.name AS subcategory_name,
   sca.description AS subcategory_description, 
   ca.name AS category_name, 
   ca.description AS category_description
-FROM food_categories AS ca INNER JOIN food_subcategories AS sca
-  ON ca.id = sca.food_category_id;
+FROM food_categories AS ca INNER JOIN food_subcategories AS sca USING(food_category_id);
 
 SELECT sca.name AS subcategory_name, 
   sca.description AS subcategory_description, 
   ca.name AS category_name, 
   ca.description AS category_description
-FROM food_categories AS ca INNER JOIN food_subcategories AS sca
-  ON ca.id = sca.food_category_id
+FROM food_categories AS ca INNER JOIN food_subcategories AS sca USING(food_category_id) 
 WHERE ca.name LIKE 'fruit';

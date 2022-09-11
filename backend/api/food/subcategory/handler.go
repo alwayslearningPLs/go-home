@@ -11,10 +11,15 @@ import (
 )
 
 const (
-	// SubcategoriesPath retrieves all the subcategories inside the db by category-name
-	SubcategoriesPath = ca.CategoryByNamePath + "/subcategories"
+	// SubcategoriesPathName is the subcategories path.
+	SubcategoriesPathName = "/subcategories"
+
+	// SubcategoriesPath retrieves all the subcategories inside the db by category-name.
+	// /food/categories/:category-name/subcategories
+	SubcategoriesPath = ca.CategoryByNamePath + SubcategoriesPathName
 	// SubcategoryByNamePath is used by the handler GetCategoryByName to
 	// return the category by name.
+	// /food/categories/:category-name/subcategories/:subcategory-name
 	SubcategoryByNamePath = SubcategoriesPath + "/:" + SubcategoryNameParam
 
 	// SubcategoryNameParam is the category name value
@@ -26,7 +31,7 @@ var ErrSubcategoryNotFound = errors.New("subcategory not found")
 func GetSubcategories(c *gin.Context) {
 	subcategories, err := getSubcategories(
 		c.Request.Context(),
-		utils.ParseRequest(c, FoodSubcategory{FoodCategory: ca.FoodCategory{Name: c.Param(ca.CategoryNameParam)}}),
+		utils.ParseRequest(c, newFoodSubcategoryFromParams(c)),
 	)
 	if err != nil || len(subcategories) == 0 {
 		if err == nil {
