@@ -27,7 +27,13 @@ type FoodUnit struct {
 	// required: true
 	// min length: 5
 	// example: a long curved fruit which grows in clusters and has soft pulpy flesh and yellow skin when ripe.
-	Description       string              `gorm:"column:description;not null" json:"description" xml:"Description"`
+	Description string `gorm:"column:description;not null" json:"description" xml:"Description"`
+	// Img is the link or the path to the img
+	//
+	// required: true
+	// min length: 5
+	// example: https://static.libertyprim.com/files/familles/peche-large.jpg?1574630286
+	Img               string              `gorm:"column:img;not null" json:"img" xml:"Img"`
 	FoodSubcategoryID int                 `json:"-" xml:"-"`
 	FoodSubcategory   sca.FoodSubcategory `json:"-" xml:"-"`
 }

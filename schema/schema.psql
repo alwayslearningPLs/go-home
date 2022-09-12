@@ -7,7 +7,7 @@ CREATE TABLE food_categories(
   food_category_id SMALLINT GENERATED ALWAYS AS IDENTITY,
   name TEXT NOT NULL UNIQUE,
   description TEXT NOT NULL,
-  PRIMARY KEY (id)
+  PRIMARY KEY (food_category_id)
 );
 
 CREATE FUNCTION FOOD_CATEGORY_BY_NAME(food_category_name TEXT)
@@ -40,7 +40,7 @@ CREATE TABLE food_subcategories(
   name TEXT NOT NULL UNIQUE,
   description TEXT NOT NULL,
   food_category_id SMALLINT NOT NULL REFERENCES food_categories(id) ON UPDATE CASCADE,
-  PRIMARY KEY(id)
+  PRIMARY KEY(food_subcategory_id)
 );
 
 CREATE FUNCTION FOOD_SUBCATEGORY_BY_NAME(food_subcategory_name TEXT)
@@ -81,8 +81,9 @@ CREATE TABLE food_units(
   food_unit_id INT GENERATED ALWAYS AS IDENTITY,
   name TEXT NOT NULL UNIQUE,
   description TEXT NOT NULL,
+  img TEXT NOT NULL,
   food_subcategory_id SMALLINT NOT NULL REFERENCES food_subcategories(id) ON UPDATE CASCADE,
-  PRIMARY KEY(id)
+  PRIMARY KEY(food_unit_id)
 );
 
 CREATE FUNCTION FOOD_UNIT_BY_NAME(food_unit_name TEXT)
@@ -102,71 +103,71 @@ BEGIN
 END
 $$;
 
-INSERT INTO food_units(name, description, food_subcategory_id)
+INSERT INTO food_units(name, description, img, food_subcategory_id)
 VALUES
   (
     'apple', 'the round fruit of a tree of the rose family, which typically has thin green or red skin and crisp flesh',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+    'https://media.istockphoto.com/photos/red-apple-picture-id184276818?k=20&m=184276818&s=612x612&w=0&h=QxOcueqAUVTdiJ7DVoCu-BkNCIuwliPEgtAQhgvBA_g=', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
   ),
   (
     'banana', 'a long curved fruit which grows in clusters and has soft pulpy flesh and yellow skin when ripe',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+    'https://www.lovemysalad.com/sites/default/files/styles/image_530x397/public/banaan-large.jpg?itok=dZxH6D_w', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
   ),
   (
     'orange', 'a large round juicy citrus fruit with a tough bright reddish-yellow rind',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+    'https://ponnaorganics.com/wp-content/uploads/2015/12/fresh-orange-500x500-1.jpg', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
   ),
   (
     'peach', 'a round stone fruit with juicy yellow flesh and downy pinkish-yellow skin',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+    'https://static.libertyprim.com/files/familles/peche-large.jpg?1574630286', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
   ),
   (
     'pear', 'a yellowish- or brownish-green edible fruit that is typically narrow at the stalk and wider towards the base, with sweet, slightly gritty flesh',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+    'something', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
   ),
   (
     'grapes', 'a berry (typically green, purple, or black) growing in clusters on a grapevine, eaten as fruit and used in making wine',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+    'something', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
   ),
   (
     'watermelon', 'the large fruit of a plant of the gourd family, with smooth green skin, red pulp, and watery juice',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+    'something', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
   ),
   (
     'cantaloupe', 'a small round melon of a variety with orange flesh and ribbed skin',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+    'something', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
   ),
   (
     'pomegranate', 'a spherical fruit with a tough golden-orange outer skin and sweet red gelatinous flesh containing many seeds',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+    'something', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
   ),
   (
     'strawberry', 'a sweet soft red fruit with a seed-studded surface',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+    'something', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
   ),
   (
     'pineapple', 'the widely cultivated tropical American plant that bears the pineapple. It is low-growing, with a spiral of spiny sword-shaped leaves on a thick ste',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+    'something', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
   ),
   (
     'mango', 'a fleshy, oval, yellowish-red tropical fruit that is eaten ripe or used green for pickles or chutneys',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+    'something', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
   ),
   (
     'raisins', 'a partially dried grape',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+    'something', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
   ),
   (
     'grapefruit', 'a large round yellow citrus fruit with an acid juicy pulp',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+    'something', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
   ),
   (
     'cherries', 'a small, soft round stone fruit that is typically bright or dark red',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
+    'something', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Whole fruit') )
   ),
   (
     'beef', 'the flesh of a cow, bull, or ox, used as food',
-    ( SELECT FOOD_SUBCATEGORY_BY_NAME('Meat, Poultry and Eggs') )
+    'something', ( SELECT FOOD_SUBCATEGORY_BY_NAME('Meat, Poultry and Eggs') )
   );
 
 CREATE TABLE food_unit_varieties(

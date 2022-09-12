@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"net/http"
 	"time"
 
 	ca "github.com/MrTimeout/go-home/backend/api/food/category"
@@ -9,6 +10,7 @@ import (
 	u "github.com/MrTimeout/go-home/backend/api/food/unit"
 	"github.com/MrTimeout/go-home/backend/internals/cmd"
 	"github.com/MrTimeout/go-home/backend/internals/config"
+	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 )
 
@@ -23,6 +25,14 @@ func main() {
 	config.GetInstance(ctx).AutoMigrate(&ca.FoodCategory{}, &sca.FoodSubcategory{}, &u.FoodUnit{})
 
 	router := gin.New()
+
+	router.Use(cors.New(cors.Config{
+		AllowMethods:     []string{http.MethodPost, http.MethodGet, http.MethodDelete},
+		AllowHeaders:     []string{"Origin"},
+		ExposeHeaders:    []string{"Content-Type", "Content-Length", "Accept-Encoding", "Authorization"},
+		AllowCredentials: true,
+		AllowAllOrigins:  true,
+	}))
 
 	food := router.Group("/food")
 	{
